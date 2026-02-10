@@ -1,0 +1,57 @@
+:root {
+  /* Brand Palette - Updated with Forest Green */
+  --bg-core: #FDFBD4;
+  /* Cream Background */
+  --bg-secondary: #FFFFFF;
+  /* Pure White Layer */
+  --text-primary: #2B2B2B;
+  /* Dark Charcoal */
+  --brand-forest: #174D38;
+  /* NEW: Forest Green */
+
+  --accent-primary: #C05800;
+  /* Vibrant Orange (for secondary CTAs) */
+  --accent-black: #000000;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(23, 77, 56, 0.05);
+  /* Green-tinted glass */
+  --glass-border: rgba(23, 77, 56, 0.1);
+}
+
+body {
+  background: var(--bg-core);
+  color: var(--text-primary);
+  font-family: var(--font-body), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading), serif;
+  color: var(--brand-forest);
+  /* Primary usage of the new green */
+  font-weight: 300;
+  font-style: italic;
+  text-transform: lowercase;
+  letter-spacing: -0.02em;
+}
+
+/* Minimalist Button using Forest Green */
+.btn-primary {
+  background-color: var(--brand-forest);
+  color: var(--bg-core);
+  padding: 12px 24px;
+  border: none;
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
