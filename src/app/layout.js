@@ -28,8 +28,15 @@ export default function RootLayout({ children }) {
           available throughout your entire CSS/Project 
       */}
       <body className={`${headingFont.variable} ${bodyFont.variable} antialiased`}>
+import "./globals.css";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
         {children}
       </body>
     </html>
   );
+}
 }
