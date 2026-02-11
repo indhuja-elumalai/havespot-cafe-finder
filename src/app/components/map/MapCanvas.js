@@ -1,53 +1,62 @@
 "use client";
 
-import { GoogleMap, useJsApiLoader, AdvancedMarkerElement } from '@react-google-maps/api';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef } from 'react';
+import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import { useStore } from '@/lib/store';
 
-const containerStyle = {
-    width: '100%',
-    height: '100vh'
-};
+export default function MapCanvas() {
+    const {
+        mapCenter,
+        mapZoom,
+        setMapCenter,
+        setMapZoom,
+        setMapIdle
+    } = useStore();
 
-const center = {
-    lat: 35.6681625,
-    lng: 139.7007624
-};
+    // Use a ref to store the initial values so they don't change on re-render
+    const initialCenter = useRef(mapCenter);
+    const initialZoom = useRef(mapZoom);
 
-function MapCanvas() {
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: "AIzaSyDLJSzdR3M7Zw6lvGorYnz_N_h_AVwUwcw",
-        // libraries: ['marker'] // Required for AdvancedMarkerElement
+        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
     });
 
-    const [map, setMap] = useState(null);
+    const onLoad = useCallback((mapInstance) => {
+        // We capture everything in 'idle' for better performance
+        // This fires once after any movement (drag or zoom) finishes
+        mapInstance.addListener('idle', () => {
+            const newCenter = mapInstance.getCenter().toJSON();
+            const newZoom = mapInstance.getZoom();
 
-    const onLoad = useCallback(function callback(mapInstance) {
-        console.log("Havespot Engine: Fully Operational");
-        setMap(mapInstance);
-    }, []);
+            setMapCenter(newCenter);
+            setMapZoom(newZoom);
+            setMapIdle(true);
 
-    const onUnmount = useCallback(function callback(mapInstance) {
-        setMap(null);
-    }, []);
+            console.log("😴 Map Idle: Store Synced", { newCenter, newZoom });
+        });
 
-    return isLoaded ? (
+        mapInstance.addListener('dragstart', () => {
+            setMapIdle(false);
+            console.log("🏃 Map moving...");
+        });
+
+    }, [setMapCenter, setMapZoom, setMapIdle]);
+
+    if (!isLoaded) return <div className="h-screen bg-[#f8f9f8]" />;
+
+    return (
         <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
-            zoom={15}
+            mapContainerStyle={{ width: '100%', height: '100vh' }}
+            // Use refs for the initial state to prevent the "fighting" loop
+            center={initialCenter.current}
+            zoom={initialZoom.current}
             onLoad={onLoad}
-            onUnmount={onUnmount}
             options={{
-                mapId: "103d3353caa555bed0bebe63", // Your ID
-                tiltInteractionEnabled: true,
-                headingInteractionEnabled: true,
+                mapId: process.env.NEXT_PUBLIC_MAP_ID,
                 disableDefaultUI: true,
+                gestureHandling: "greedy", // Improves responsiveness
             }}
-        >
-            {/* Child components, such as markers, info windows, etc. */}
-        </GoogleMap>
-    ) : <div style={{ background: '#f8f9f8', height: '100vh' }} />;
+        />
+    );
 }
-
-export default MapCanvas;
